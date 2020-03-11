@@ -14,6 +14,23 @@ def nothing(x):  # 滑动条的回调函数
     pass
 
 
+# 获取背景图片并保存
+def getbackground():
+    cap = cv2.VideoCapture(0)
+    num = 0
+    while True:
+        ok, frame = cap.read()
+        image = cv2.GaussianBlur(frame, (5, 5), 0)  # 高斯滤波
+        # cv2.imshow("gauss",image)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  # 将图片转化成灰度
+        num = num + 1
+        if num == 10:
+            backgound = gray
+            cv2.imwrite("images/backgound.jpg", backgound)
+            cv2.imshow("backgound", backgound)
+            break
+
+
 # 播放请带好口罩音频
 def slogan_short():
     timeplay = 1.5
@@ -44,21 +61,6 @@ def slogan():
             playflag = 0
         time.sleep(0)
         # print("slogantread running")
-
-
-# 霍夫变换找直线
-def line_detect_possible_demo(image):
-    # 通常用第二种方式。
-    gray1 = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray1, 50, 150, apertureSize=3)
-    # 自动检测可能的直线，返回的是一条条线段
-    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 80, minLineLength=50, maxLineGap=10)
-    print(type(lines))
-    # 在image上标出所有直线
-    for line in lines:
-        x1, y1, x2, y2 = line[0]
-        cv2.line(image, (x1, y1), (x2, y2), (200, 0, 0), 2)
-    cv2.imshow("linepossible_demo", image)
 
 
 # 面部识别初始化
@@ -218,14 +220,17 @@ def mogseparate(image):
     ret, binary = cv2.threshold(fgmask, 220, 255, cv2.THRESH_BINARY)
     cv2.imshow("fgmask", fgmask)
     binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, se)
+
+    cv2.imshow('erode', binary)
+
     backgimage = mog.getBackgroundImage()
     # 查找轮廓
     # contours, hierarchy = cv2.findContours(binary,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     # cv2.drawContours(binary,contours,-1,(0,0,255),3)
     binary = cv2.erode(binary, None, iterations=4)  # 腐蚀
-    cv2.imshow('erode', binary)
+
     cv2.imshow("backgimage", backgimage)
-    cv2.imshow("frame", image)
+    # cv2.imshow("frame", image)
     cv2.imshow("binary", binary)
 
 
@@ -251,6 +256,7 @@ def trackAvg(image, k_write):
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
 face_cascade.load("data/haarcascades/haarcascade_frontalface_alt2.xml")
 '''此文件是opencv的haar人脸特征分类器'''
+
 eyes_cascade = cv2.CascadeClassifier("haarcascade_eye_tree_eyeglasses.xml")
 eyes_cascade.load("data/haarcascades/haarcascade_eye_tree_eyeglasses.xml")
 '''此文件是opencv的haar眼镜特征分类器'''
@@ -282,15 +288,15 @@ if __name__ == '__main__':
     facesdetecter_init()
     k_write = 1
     capture = cv2.VideoCapture(0)
-    image = cv2.imread("images/4.jpg")
+    getbackground()  # 保存背景
+    # image = cv2.imread("images/4.jpg")
     # while 0:
     #     facesdetecter(image)  # 对图片检测
     #     cv2.waitKey()
     #     cv2.destroyAllWindows()
     while True:
-
         ref, frame = capture.read()
-        if ref == False:
+        if not ref:
             print("打开摄像头错误")
             break
         # cv2.imshow("frame",frame)
@@ -300,12 +306,14 @@ if __name__ == '__main__':
             capture.release()
             break
         facesdetecter(frame)  # 对视频检测
-
         # mogseparate(frame)#mog方式分离前景
-        knnseperate(frame)#knn方式分离前景
+        # knnseperate(frame)#knn方式分离前景
         # trackAvg(frame,k_write)#runningavg分离前景
 
     # cap.release()
     cv2.destroyAllWindows()
-    print("byebye~")
+    print("ByeBye~")
+
     os._exit(0)
+
+
