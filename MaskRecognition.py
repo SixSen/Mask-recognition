@@ -159,9 +159,9 @@ def facesdetecter(image):
                 total_area_eyes += Area
         if total_area_eyes != 0:
             print("Eyes Area =", total_area_eyes)
-            frame = cv2.putText(image, "Eyes Area : {:.3f}".format(total_area_eyes), (120, 40),
-                                cv2.FONT_HERSHEY_COMPLEX,
-                                0.5, (0, 255, 0), 1)  # 绘制
+            # frame = cv2.putText(image, "Eyes = {:.3f}".format(total_area_eyes), (120, 40),
+            #                     cv2.FONT_HERSHEY_COMPLEX,
+            #                     0.5, (0, 255, 0), 1)  # 绘制
 
         # 口罩区域
         rect_mask = [(x, y + h, w, h * 2)]  # 口罩区域是眼睛的区域的下方的两倍高度位置
@@ -179,8 +179,8 @@ def facesdetecter(image):
                 total_area_mask += Area
         if total_area_eyes != 0:
             print("Mask Area =", total_area_mask)
-            frame = cv2.putText(image, "Mask Area : {:.1f}".format(total_area_mask), (120, 80), cv2.FONT_HERSHEY_COMPLEX,
-                                0.5, (0, 0, 255), 1)  # 显示口罩区域面积
+            # frame = cv2.putText(image, "Mask = {:.1f}".format(total_area_mask), (120, 80), cv2.FONT_HERSHEY_COMPLEX,
+            #                     0.5, (0, 0, 255), 1)  # 显示口罩区域面积
 
         # print("{}-prospect:{}".format(count,Area),end="  ") #打印出每个前景的面积
         if total_area_eyes == total_area_mask == 0:
